@@ -1,15 +1,4 @@
-# 🎓 高考志愿智能推荐系统 | Smart Gaokao Advisor
-
-![GitHub](https://img.shields.io/github/license/fjx13038033078/ruoyi-CERS)
-![jdk version](https://img.shields.io/badge/JDK-17-blue.svg)
-![node.js version](https://img.shields.io/badge/nodejs-16-orange.svg)
-![GitHub Repo stars](https://img.shields.io/github/stars/fjx13038033078/ruoyi-CERS)
-
-基于 SpringBoot + Vue 的高考志愿智能推荐系统，结合高校录取线、985/211 分布、院校排名和专业前景等多维数据，帮助你做出更明智的选择！
-
-> 📌 如果你觉得项目不错，欢迎点个 Star ⭐ 支持一下！
-
----
+# 🎓 高考志愿智能填报系统 | College Entrance Examination Application Intelligent System
 
 ## 🔍 项目简介
 
@@ -72,13 +61,7 @@ git clone https://github.com/fjx13038033078/ruoyi-CERS.git
 **📧 联系方式：** `c1111111c@163.com`  
 **💬 微信 ：** `445981543`  
 
----
 
-## ☕ 支持作者
-
-如果你觉得本项目对你有帮助，欢迎请作者喝杯咖啡，支持项目持续更新！🎉
-
-<img src="screenshots/wechat_donate.png" alt="微信收款码" width="300" />
 
 
 
