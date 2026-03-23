@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.college.mapper.HollandAnswerMapper">
+
+    <resultMap type="com.ruoyi.college.domain.HollandAnswer" id="HollandAnswerResult">
+        <id property="answerId" column="answer_id"/>
+        <result property="recordId" column="record_id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="selectedOption" column="selected_option"/>
+    </resultMap>
+
+    <select id="selectByRecordId" parameterType="Long" resultMap="HollandAnswerResult">
+        SELECT * FROM cers_holland_answer WHERE record_id = #{recordId}
+    </select>
+
+    <insert id="insertAnswer" parameterType="com.ruoyi.college.domain.HollandAnswer" useGeneratedKeys="true" keyProperty="answerId">
+        INSERT INTO cers_holland_answer (record_id, question_id, selected_option)
+        VALUES (#{recordId}, #{questionId}, #{selectedOption})
+    </insert>
+
+    <insert id="batchInsertAnswers" parameterType="list">
+        INSERT INTO cers_holland_answer (record_id, question_id, selected_option) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.recordId}, #{item.questionId}, #{item.selectedOption})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByRecordId" parameterType="Long">
+        DELETE FROM cers_holland_answer WHERE record_id = #{recordId}
+    </delete>
+
+</mapper>

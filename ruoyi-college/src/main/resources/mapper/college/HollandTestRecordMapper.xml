@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.college.mapper.HollandTestRecordMapper">
+
+    <resultMap type="com.ruoyi.college.domain.HollandTestRecord" id="HollandTestRecordResult">
+        <id property="recordId" column="record_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="status" column="status"/>
+        <result property="startTime" column="start_time"/>
+        <result property="finishTime" column="finish_time"/>
+    </resultMap>
+
+    <select id="selectByUserId" parameterType="Long" resultMap="HollandTestRecordResult">
+        SELECT * FROM cers_holland_test_record WHERE user_id = #{userId} ORDER BY start_time DESC
+    </select>
+
+    <select id="selectByRecordId" parameterType="Long" resultMap="HollandTestRecordResult">
+        SELECT * FROM cers_holland_test_record WHERE record_id = #{recordId}
+    </select>
+
+    <select id="selectLatestByUserId" parameterType="Long" resultMap="HollandTestRecordResult">
+        SELECT * FROM cers_holland_test_record WHERE user_id = #{userId} ORDER BY start_time DESC LIMIT 1
+    </select>
+
+    <insert id="insertRecord" parameterType="com.ruoyi.college.domain.HollandTestRecord" useGeneratedKeys="true" keyProperty="recordId">
+        INSERT INTO cers_holland_test_record (user_id, status) VALUES (#{userId}, #{status})
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE cers_holland_test_record SET status = #{status}, finish_time = NOW() WHERE record_id = #{recordId}
+    </update>
+
+</mapper>

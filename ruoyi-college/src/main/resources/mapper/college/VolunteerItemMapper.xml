@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.college.mapper.VolunteerItemMapper">
+
+    <resultMap type="com.ruoyi.college.domain.VolunteerItem" id="VolunteerItemResult">
+        <id property="itemId" column="item_id"/>
+        <result property="formId" column="form_id"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="universityId" column="university_id"/>
+        <result property="majorId1" column="major_id_1"/>
+        <result property="majorId2" column="major_id_2"/>
+        <result property="majorId3" column="major_id_3"/>
+        <result property="majorId4" column="major_id_4"/>
+        <result property="majorId5" column="major_id_5"/>
+        <result property="majorId6" column="major_id_6"/>
+        <result property="isAdjustment" column="is_adjustment"/>
+        <result property="checkStatus" column="check_status"/>
+        <result property="checkMessages" column="check_messages"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="selectItemsByFormId" parameterType="Long" resultMap="VolunteerItemResult">
+        SELECT vi.*, u.university_name
+        FROM cers_volunteer_item vi
+        LEFT JOIN cers_university u ON vi.university_id = u.university_id
+        WHERE vi.form_id = #{formId}
+        ORDER BY vi.sort_order ASC
+    </select>
+
+    <select id="selectByItemId" parameterType="Long" resultMap="VolunteerItemResult">
+        SELECT * FROM cers_volunteer_item WHERE item_id = #{itemId}
+    </select>
+
+    <insert id="insertItem" parameterType="com.ruoyi.college.domain.VolunteerItem" useGeneratedKeys="true" keyProperty="itemId">
+        INSERT INTO cers_volunteer_item (form_id, sort_order, university_id,
+            major_id_1, major_id_2, major_id_3, major_id_4, major_id_5, major_id_6,
+            is_adjustment, check_status, check_messages)
+        VALUES (#{formId}, #{sortOrder}, #{universityId},
+            #{majorId1}, #{majorId2}, #{majorId3}, #{majorId4}, #{majorId5}, #{majorId6},
+            #{isAdjustment}, #{checkStatus}, #{checkMessages})
+    </insert>
+
+    <update id="updateItem" parameterType="com.ruoyi.college.domain.VolunteerItem">
+        UPDATE cers_volunteer_item
+        <set>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="universityId != null">university_id = #{universityId},</if>
+            major_id_1 = #{majorId1},
+            major_id_2 = #{majorId2},
+            major_id_3 = #{majorId3},
+            major_id_4 = #{majorId4},
+            major_id_5 = #{majorId5},
+            major_id_6 = #{majorId6},
+            <if test="isAdjustment != null">is_adjustment = #{isAdjustment},</if>
+        </set>
+        WHERE item_id = #{itemId}
+    </update>
+
+    <update id="updateCheckResult">
+        UPDATE cers_volunteer_item SET check_status = #{checkStatus}, check_messages = #{checkMessages}
+        WHERE item_id = #{itemId}
+    </update>
+
+    <delete id="deleteByItemId" parameterType="Long">
+        DELETE FROM cers_volunteer_item WHERE item_id = #{itemId}
+    </delete>
+
+    <delete id="deleteByFormId" parameterType="Long">
+        DELETE FROM cers_volunteer_item WHERE form_id = #{formId}
+    </delete>
+
+    <select id="countByFormId" parameterType="Long" resultType="int">
+        SELECT COUNT(1) FROM cers_volunteer_item WHERE form_id = #{formId}
+    </select>
+
+</mapper>

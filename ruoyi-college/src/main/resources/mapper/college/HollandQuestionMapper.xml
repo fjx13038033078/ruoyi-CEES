@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.college.mapper.HollandQuestionMapper">
+
+    <resultMap type="com.ruoyi.college.domain.HollandQuestion" id="HollandQuestionResult">
+        <id property="questionId" column="question_id"/>
+        <result property="questionText" column="question_text"/>
+        <result property="optionA" column="option_a"/>
+        <result property="optionB" column="option_b"/>
+        <result property="dimensionA" column="dimension_a"/>
+        <result property="dimensionB" column="dimension_b"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <select id="selectAllActive" resultMap="HollandQuestionResult">
+        SELECT * FROM cers_holland_question WHERE status = 0 ORDER BY sort_order ASC
+    </select>
+
+    <select id="selectByQuestionId" parameterType="Long" resultMap="HollandQuestionResult">
+        SELECT * FROM cers_holland_question WHERE question_id = #{questionId}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.college.domain.HollandQuestion" resultMap="HollandQuestionResult">
+        SELECT * FROM cers_holland_question
+        <where>
+            <if test="questionText != null and questionText != ''">
+                AND question_text LIKE CONCAT('%', #{questionText}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY sort_order ASC
+    </select>
+
+    <insert id="insertQuestion" parameterType="com.ruoyi.college.domain.HollandQuestion" useGeneratedKeys="true" keyProperty="questionId">
+        INSERT INTO cers_holland_question (question_text, option_a, option_b, dimension_a, dimension_b, sort_order, status)
+        VALUES (#{questionText}, #{optionA}, #{optionB}, #{dimensionA}, #{dimensionB}, #{sortOrder}, #{status})
+    </insert>
+
+    <update id="updateQuestion" parameterType="com.ruoyi.college.domain.HollandQuestion">
+        UPDATE cers_holland_question
+        <set>
+            <if test="questionText != null">question_text = #{questionText},</if>
+            <if test="optionA != null">option_a = #{optionA},</if>
+            <if test="optionB != null">option_b = #{optionB},</if>
+            <if test="dimensionA != null">dimension_a = #{dimensionA},</if>
+            <if test="dimensionB != null">dimension_b = #{dimensionB},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE question_id = #{questionId}
+    </update>
+
+    <delete id="deleteByQuestionId" parameterType="Long">
+        DELETE FROM cers_holland_question WHERE question_id = #{questionId}
+    </delete>
+
+</mapper>

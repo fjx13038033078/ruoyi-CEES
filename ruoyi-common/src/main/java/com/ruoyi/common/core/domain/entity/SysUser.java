@@ -127,6 +127,11 @@ public class SysUser extends BaseEntity {
     private Long roleId;
 
     /**
+     * 用户类型（00系统用户 01考生 02家长 03招生管理员）
+     */
+    private String userType;
+
+    /**
      * 余额
      */
     private BigDecimal balance;
@@ -157,6 +162,14 @@ public class SysUser extends BaseEntity {
 
     public Long getDeptId() {
         return deptId;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 
     public void setBalance(BigDecimal balance) {

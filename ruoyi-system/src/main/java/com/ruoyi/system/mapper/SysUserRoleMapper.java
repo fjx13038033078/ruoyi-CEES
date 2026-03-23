@@ -63,6 +63,8 @@ public interface SysUserRoleMapper
 
     public int insertDefaultRole(Long userId);
 
+    public int insertUserRoleWithRoleId(@Param("userId") Long userId, @Param("roleId") Long roleId);
+
     public List<Long> searchAllByRoleId(Long roleId);
 
 }

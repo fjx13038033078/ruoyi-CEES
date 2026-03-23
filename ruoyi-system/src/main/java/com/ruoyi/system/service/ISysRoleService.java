@@ -186,4 +186,9 @@ public interface ISysRoleService
      * @return
      */
     public int insertDefaultRole(Long userId);
+
+    /**
+     * 为用户分配指定角色
+     */
+    public int insertUserRole(Long userId, Long roleId);
 }

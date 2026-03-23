@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.college.mapper.HollandResultMapper">
+
+    <resultMap type="com.ruoyi.college.domain.HollandResult" id="HollandResultMap">
+        <id property="resultId" column="result_id"/>
+        <result property="recordId" column="record_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="rScore" column="r_score"/>
+        <result property="iScore" column="i_score"/>
+        <result property="aScore" column="a_score"/>
+        <result property="sScore" column="s_score"/>
+        <result property="eScore" column="e_score"/>
+        <result property="cScore" column="c_score"/>
+        <result property="hollandCode" column="holland_code"/>
+        <result property="personalitySummary" column="personality_summary"/>
+        <result property="recommendedMajors" column="recommended_majors"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="selectByRecordId" parameterType="Long" resultMap="HollandResultMap">
+        SELECT * FROM cers_holland_result WHERE record_id = #{recordId}
+    </select>
+
+    <select id="selectLatestByUserId" parameterType="Long" resultMap="HollandResultMap">
+        SELECT * FROM cers_holland_result WHERE user_id = #{userId} ORDER BY create_time DESC LIMIT 1
+    </select>
+
+    <select id="selectByUserId" parameterType="Long" resultMap="HollandResultMap">
+        SELECT * FROM cers_holland_result WHERE user_id = #{userId} ORDER BY create_time DESC
+    </select>
+
+    <insert id="insertResult" parameterType="com.ruoyi.college.domain.HollandResult" useGeneratedKeys="true" keyProperty="resultId">
+        INSERT INTO cers_holland_result (record_id, user_id, r_score, i_score, a_score, s_score, e_score, c_score,
+            holland_code, personality_summary, recommended_majors)
+        VALUES (#{recordId}, #{userId}, #{rScore}, #{iScore}, #{aScore}, #{sScore}, #{eScore}, #{cScore},
+            #{hollandCode}, #{personalitySummary}, #{recommendedMajors})
+    </insert>
+
+</mapper>

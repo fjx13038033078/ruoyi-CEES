@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.college.mapper.StudentProfileMapper">
+
+    <resultMap type="com.ruoyi.college.domain.StudentProfile" id="StudentProfileResult">
+        <id property="profileId" column="profile_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="realName" column="real_name"/>
+        <result property="idCard" column="id_card"/>
+        <result property="examNumber" column="exam_number"/>
+        <result property="province" column="province"/>
+        <result property="examYear" column="exam_year"/>
+        <result property="subjectType" column="subject_type"/>
+        <result property="selectedSubjects" column="selected_subjects"/>
+        <result property="totalScore" column="total_score"/>
+        <result property="scoreChinese" column="score_chinese"/>
+        <result property="scoreMath" column="score_math"/>
+        <result property="scoreEnglish" column="score_english"/>
+        <result property="scorePrimary" column="score_primary"/>
+        <result property="scoreSecondary1" column="score_secondary1"/>
+        <result property="scoreSecondary2" column="score_secondary2"/>
+        <result property="sex" column="sex"/>
+        <result property="colorBlind" column="color_blind"/>
+        <result property="colorWeak" column="color_weak"/>
+        <result property="verifyStatus" column="verify_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="selectProfileList" parameterType="com.ruoyi.college.domain.StudentProfile" resultMap="StudentProfileResult">
+        SELECT p.*, u.user_name FROM cers_student_profile p
+        LEFT JOIN sys_user u ON p.user_id = u.user_id
+        WHERE 1=1
+        <if test="realName != null and realName != ''">
+            AND p.real_name LIKE CONCAT('%', #{realName}, '%')
+        </if>
+        <if test="examNumber != null and examNumber != ''">
+            AND p.exam_number = #{examNumber}
+        </if>
+        <if test="verifyStatus != null">
+            AND p.verify_status = #{verifyStatus}
+        </if>
+        <if test="province != null and province != ''">
+            AND p.province = #{province}
+        </if>
+        ORDER BY p.create_time DESC
+    </select>
+
+    <select id="selectByUserId" parameterType="Long" resultMap="StudentProfileResult">
+        SELECT * FROM cers_student_profile WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectByProfileId" parameterType="Long" resultMap="StudentProfileResult">
+        SELECT * FROM cers_student_profile WHERE profile_id = #{profileId}
+    </select>
+
+    <select id="selectByIdCard" parameterType="String" resultMap="StudentProfileResult">
+        SELECT * FROM cers_student_profile WHERE id_card = #{idCard}
+    </select>
+
+    <select id="selectByExamNumber" parameterType="String" resultMap="StudentProfileResult">
+        SELECT * FROM cers_student_profile WHERE exam_number = #{examNumber}
+    </select>
+
+    <insert id="insertProfile" parameterType="com.ruoyi.college.domain.StudentProfile" useGeneratedKeys="true" keyProperty="profileId">
+        INSERT INTO cers_student_profile (user_id, real_name, id_card, exam_number, province, exam_year,
+            subject_type, selected_subjects, total_score, score_chinese, score_math, score_english,
+            score_primary, score_secondary1, score_secondary2, sex, color_blind, color_weak, verify_status)
+        VALUES (#{userId}, #{realName}, #{idCard}, #{examNumber}, #{province}, #{examYear},
+            #{subjectType}, #{selectedSubjects}, #{totalScore}, #{scoreChinese}, #{scoreMath}, #{scoreEnglish},
+            #{scorePrimary}, #{scoreSecondary1}, #{scoreSecondary2}, #{sex}, #{colorBlind}, #{colorWeak}, #{verifyStatus})
+    </insert>
+
+    <update id="updateProfile" parameterType="com.ruoyi.college.domain.StudentProfile">
+        UPDATE cers_student_profile
+        <set>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="idCard != null">id_card = #{idCard},</if>
+            <if test="examNumber != null">exam_number = #{examNumber},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="examYear != null">exam_year = #{examYear},</if>
+            <if test="subjectType != null">subject_type = #{subjectType},</if>
+            <if test="selectedSubjects != null">selected_subjects = #{selectedSubjects},</if>
+            <if test="totalScore != null">total_score = #{totalScore},</if>
+            <if test="scoreChinese != null">score_chinese = #{scoreChinese},</if>
+            <if test="scoreMath != null">score_math = #{scoreMath},</if>
+            <if test="scoreEnglish != null">score_english = #{scoreEnglish},</if>
+            <if test="scorePrimary != null">score_primary = #{scorePrimary},</if>
+            <if test="scoreSecondary1 != null">score_secondary1 = #{scoreSecondary1},</if>
+            <if test="scoreSecondary2 != null">score_secondary2 = #{scoreSecondary2},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="colorBlind != null">color_blind = #{colorBlind},</if>
+            <if test="colorWeak != null">color_weak = #{colorWeak},</if>
+            <if test="verifyStatus != null">verify_status = #{verifyStatus},</if>
+        </set>
+        WHERE profile_id = #{profileId}
+    </update>
+
+    <update id="updateVerifyStatus">
+        UPDATE cers_student_profile SET verify_status = #{verifyStatus} WHERE profile_id = #{profileId}
+    </update>
+
+    <delete id="deleteByProfileId" parameterType="Long">
+        DELETE FROM cers_student_profile WHERE profile_id = #{profileId}
+    </delete>
+
+</mapper>

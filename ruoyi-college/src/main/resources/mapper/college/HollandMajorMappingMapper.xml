@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.college.mapper.HollandMajorMappingMapper">
+
+    <resultMap type="com.ruoyi.college.domain.HollandMajorMapping" id="HollandMajorMappingResult">
+        <id property="mappingId" column="mapping_id"/>
+        <result property="hollandCode" column="holland_code"/>
+        <result property="majorDirection" column="major_direction"/>
+        <result property="majorKeywords" column="major_keywords"/>
+        <result property="description" column="description"/>
+    </resultMap>
+
+    <select id="selectByHollandCode" parameterType="String" resultMap="HollandMajorMappingResult">
+        SELECT * FROM cers_holland_major_mapping WHERE holland_code = #{hollandCode}
+    </select>
+
+    <select id="selectAll" resultMap="HollandMajorMappingResult">
+        SELECT * FROM cers_holland_major_mapping ORDER BY holland_code
+    </select>
+
+    <select id="selectByMappingId" parameterType="Long" resultMap="HollandMajorMappingResult">
+        SELECT * FROM cers_holland_major_mapping WHERE mapping_id = #{mappingId}
+    </select>
+
+    <insert id="insertMapping" parameterType="com.ruoyi.college.domain.HollandMajorMapping" useGeneratedKeys="true" keyProperty="mappingId">
+        INSERT INTO cers_holland_major_mapping (holland_code, major_direction, major_keywords, description)
+        VALUES (#{hollandCode}, #{majorDirection}, #{majorKeywords}, #{description})
+    </insert>
+
+    <update id="updateMapping" parameterType="com.ruoyi.college.domain.HollandMajorMapping">
+        UPDATE cers_holland_major_mapping
+        <set>
+            <if test="hollandCode != null">holland_code = #{hollandCode},</if>
+            <if test="majorDirection != null">major_direction = #{majorDirection},</if>
+            <if test="majorKeywords != null">major_keywords = #{majorKeywords},</if>
+            <if test="description != null">description = #{description},</if>
+        </set>
+        WHERE mapping_id = #{mappingId}
+    </update>
+
+    <delete id="deleteByMappingId" parameterType="Long">
+        DELETE FROM cers_holland_major_mapping WHERE mapping_id = #{mappingId}
+    </delete>
+
+</mapper>

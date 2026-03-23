@@ -12,6 +12,7 @@ import com.ruoyi.common.utils.MessageUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,9 @@ public class SysRegisterService
     private ISysConfigService configService;
 
     @Autowired
+    private ISysRoleService roleService;
+
+    @Autowired
     private RedisCache redisCache;
 
     /**
@@ -44,7 +48,6 @@ public class SysRegisterService
         SysUser sysUser = new SysUser();
         sysUser.setUserName(username);
 
-        // 验证码开关
         boolean captchaEnabled = configService.selectCaptchaEnabled();
         if (captchaEnabled)
         {
@@ -75,8 +78,15 @@ public class SysRegisterService
         }
         else
         {
-            sysUser.setNickName(username);
+            sysUser.setNickName(StringUtils.isNotEmpty(registerBody.getRealName()) ? registerBody.getRealName() : username);
             sysUser.setPassword(SecurityUtils.encryptPassword(password));
+
+            String userType = registerBody.getUserType();
+            if (StringUtils.isNotEmpty(userType))
+            {
+                sysUser.setUserType(userType);
+            }
+
             boolean regFlag = userService.registerUser(sysUser);
             if (!regFlag)
             {
@@ -84,6 +94,16 @@ public class SysRegisterService
             }
             else
             {
+                // 根据用户类型分配角色（registerUser 已默认分配 101）
+                Long userId = sysUser.getUserId();
+                if ("01".equals(userType))
+                {
+                    roleService.insertUserRole(userId, 102L);
+                }
+                else if ("02".equals(userType))
+                {
+                    roleService.insertUserRole(userId, 103L);
+                }
                 AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success")));
             }
         }
@@ -92,11 +112,6 @@ public class SysRegisterService
 
     /**
      * 校验验证码
-     * 
-     * @param username 用户名
-     * @param code 验证码
-     * @param uuid 唯一标识
-     * @return 结果
      */
     public void validateCaptcha(String username, String code, String uuid)
     {
