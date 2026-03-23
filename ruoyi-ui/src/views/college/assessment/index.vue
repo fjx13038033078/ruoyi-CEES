@@ -79,11 +79,11 @@ export default {
     },
     handleStart() {
       if (this.latestRecord && this.latestRecord.status === 0) {
-        this.$router.push({ path: '/volunteer/assessment', query: { recordId: this.latestRecord.recordId } });
+        this.$router.push({ path: '/volunteer/test', query: { recordId: this.latestRecord.recordId } });
       } else {
         startTest().then(res => {
           const record = res.data;
-          this.$router.push({ path: '/volunteer/assessment', query: { recordId: record.recordId } });
+          this.$router.push({ path: '/volunteer/test', query: { recordId: record.recordId } });
         });
       }
     },

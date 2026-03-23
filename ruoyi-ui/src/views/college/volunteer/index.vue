@@ -98,7 +98,7 @@ export default {
       });
     },
     handleEdit(form) {
-      this.$router.push({ path: '/volunteer/form', query: { formId: form.formId } });
+      this.$router.push({ path: '/volunteer/formEdit', query: { formId: form.formId } });
     },
     handleCheck(form) {
       checkForm(form.formId).then(res => {
