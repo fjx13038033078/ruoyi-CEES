@@ -3,7 +3,7 @@
     <div class="login-container">
       <div class="login-content">
         <div class="login-header">
-          <h2 class="title">高考志愿个性化推荐系统</h2>
+          <h2 class="title">高考志愿智能填报系统</h2>
           <p class="subtitle">欢迎回来！请登录您的账号</p>
         </div>
         <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
@@ -296,17 +296,17 @@ export default {
 
   ::v-deep .el-checkbox {
     color: #fff;
-    
+
     .el-checkbox__inner {
       background: rgba(255, 255, 255, 0.2);
       border-color: rgba(255, 255, 255, 0.6);
     }
-    
+
     .el-checkbox__input.is-checked .el-checkbox__inner {
       background: #1a5fb4;
       border-color: #1a5fb4;
     }
-    
+
     .el-checkbox__label {
       color: #fff;
       font-weight: 500;

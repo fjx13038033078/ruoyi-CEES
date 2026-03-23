@@ -74,7 +74,7 @@
             <i class="el-icon-s-opportunity"></i>
           </div>
           <div class="title-text">
-            <h1>高考志愿个性化推荐系统</h1>
+            <h1>高考志愿智能填报系统</h1>
             <p class="title-desc">智能分析 · 精准推荐 · 助力圆梦</p>
           </div>
         </div>
@@ -336,7 +336,7 @@ export default {
               left: 'center',
               top: 'center',
               style: {
-                text: '高考志愿个性化推荐系统',
+                text: '高考志愿智能填报系统',
                 fontSize: 80,
                 fontWeight: 'bold',
                 lineDash: [0, 200],

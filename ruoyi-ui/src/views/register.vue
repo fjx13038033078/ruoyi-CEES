@@ -3,15 +3,15 @@
     <div class="register-container">
       <div class="register-content">
         <div class="register-header">
-          <h2 class="title">高考志愿个性化推荐系统</h2>
+          <h2 class="title">高考志愿智能填报系统</h2>
           <p class="subtitle">创建新账号</p>
         </div>
         <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
           <el-form-item prop="username">
-            <el-input 
-              v-model="registerForm.username" 
-              type="text" 
-              auto-complete="off" 
+            <el-input
+              v-model="registerForm.username"
+              type="text"
+              auto-complete="off"
               placeholder="请输入账号"
               class="custom-input"
             >
