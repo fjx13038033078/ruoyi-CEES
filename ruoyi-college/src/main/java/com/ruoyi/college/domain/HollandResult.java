@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -26,11 +28,17 @@ public class HollandResult implements Serializable {
 
     private Long userId;
 
+    @JsonProperty("rScore")
     private Integer rScore;
+    @JsonProperty("iScore")
     private Integer iScore;
+    @JsonProperty("aScore")
     private Integer aScore;
+    @JsonProperty("sScore")
     private Integer sScore;
+    @JsonProperty("eScore")
     private Integer eScore;
+    @JsonProperty("cScore")
     private Integer cScore;
 
     private String hollandCode;
