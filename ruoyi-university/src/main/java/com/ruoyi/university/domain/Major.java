@@ -60,6 +60,10 @@ public class Major implements Serializable {
     @TableField(exist = false)
     private int maxScore;
 
+    /** 列表筛选/排序所用投档线年份：2023、2024、2025；不传则按 COALESCE(2025,2024,2023) 筛选与排序 */
+    @TableField(exist = false)
+    private Integer scoreYear;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

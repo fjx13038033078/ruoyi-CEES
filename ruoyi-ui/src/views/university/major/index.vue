@@ -3,17 +3,27 @@
     <!-- 搜索表单 -->
     <el-form :inline="true" :model="searchParams" class="demo-form-inline">
       <el-form-item label="专业关键字">
-        <el-input v-model="searchParams.keyword" placeholder="请输入专业关键字"></el-input>
+        <el-input v-model="searchParams.keyword" placeholder="请输入专业关键字" clearable style="width: 180px"></el-input>
       </el-form-item>
       <el-form-item label="所学科目">
-        <el-select v-model="searchParams.subject" placeholder="请选择">
+        <el-select v-model="searchParams.subject" placeholder="请选择" clearable style="width: 120px">
           <el-option label="历史类" :value="1"></el-option>
           <el-option label="物理类" :value="2"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="投档线年份">
+        <el-select v-model="searchParams.scoreYear" placeholder="筛选所用年份" style="width: 130px">
+          <el-option label="2025年" :value="2025"></el-option>
+          <el-option label="2024年" :value="2024"></el-option>
+          <el-option label="2023年" :value="2023"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="分数线范围">
-        <el-input-number v-model="searchParams.minScore" placeholder="最低分数"></el-input-number>
-        <el-input-number v-model="searchParams.maxScore" placeholder="最高分数"></el-input-number>
+        <span class="score-range">
+          <el-input-number v-model="searchParams.minScore" :min="0" :max="750" placeholder="最低" controls-position="right" style="width: 130px"></el-input-number>
+          <span class="range-sep">~</span>
+          <el-input-number v-model="searchParams.maxScore" :min="0" :max="750" placeholder="最高" controls-position="right" style="width: 130px"></el-input-number>
+        </span>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -23,15 +33,29 @@
 
     <!-- 专业列表 -->
     <el-table :data="majorList" v-loading="loading" border style="width: 100%">
-      <el-table-column label="专业名称" prop="majorName" align="center"></el-table-column>
-      <el-table-column label="院校名称" prop="universityName" align="center"></el-table-column>
-      <el-table-column label="所学科目" prop="subject" align="center">
+      <el-table-column label="专业名称" prop="majorName" align="center" min-width="140"></el-table-column>
+      <el-table-column label="院校名称" prop="universityName" align="center" min-width="160"></el-table-column>
+      <el-table-column label="所学科目" prop="subject" align="center" width="90">
         <template #default="scope">
           <span>{{ scope.row.subject === 1 ? '历史类' : '物理类' }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="分数线" prop="minScore2024" align="center"></el-table-column>
-      <el-table-column label="操作" align="center" width="220">
+      <el-table-column label="2023投档线" prop="minScore2023" align="center" width="100">
+        <template #default="scope">
+          <span>{{ formatScore(scope.row.minScore2023) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="2024投档线" prop="minScore2024" align="center" width="100">
+        <template #default="scope">
+          <span>{{ formatScore(scope.row.minScore2024) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="2025投档线" prop="minScore2025" align="center" width="100">
+        <template #default="scope">
+          <span>{{ formatScore(scope.row.minScore2025) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="120" fixed="right">
         <template #default="scope">
           <el-button
             type="success"
@@ -70,7 +94,7 @@ export default {
       searchParams: {
         keyword: '',
         subject: null,
-        enrollmentSubject: null,
+        scoreYear: 2025,
         minScore: null,
         maxScore: null,
       }
@@ -80,6 +104,10 @@ export default {
     this.fetchMajors();
   },
   methods: {
+    formatScore(val) {
+      if (val === null || val === undefined || val === '') return '-';
+      return val;
+    },
     fetchMajors() {
       this.loading = true;
       const params = {
@@ -93,17 +121,18 @@ export default {
       });
     },
     handleSearch() {
-      this.queryParams.pageNum = 1; // 重置页码
+      this.queryParams.pageNum = 1;
       this.fetchMajors();
     },
     handleReset() {
       this.searchParams = {
         keyword: '',
         subject: null,
+        scoreYear: 2025,
         minScore: null,
         maxScore: null,
       };
-      this.handleSearch(); // 重置后重新加载数据
+      this.handleSearch();
     },
     handleStoreup(row) {
       const data = {
@@ -124,5 +153,13 @@ export default {
   padding: 10px;
   background-color: #f5f7fa;
   border-radius: 4px;
+}
+.score-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.range-sep {
+  color: #909399;
 }
 </style>
