@@ -17,6 +17,14 @@ export function getNotice(noticeId) {
   })
 }
 
+/** 首页等场景只读查看已发布公告（无需管理端查询权限） */
+export function getPublicNotice(noticeId) {
+  return request({
+    url: '/system/notice/public/' + noticeId,
+    method: 'get'
+  })
+}
+
 // 新增公告
 export function addNotice(data) {
   return request({

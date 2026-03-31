@@ -82,6 +82,27 @@
       </div>
 
       <div class="dashboard-content">
+        <!-- 普通用户：近期通知公告（只读，点击标题查看正文） -->
+        <el-card class="user-notice-card" shadow="never">
+          <div slot="header" class="user-notice-header">
+            <span><i class="el-icon-bell"></i> 通知公告</span>
+            <span class="user-notice-sub">近期更新 · 仅可查看</span>
+          </div>
+          <div v-if="userHomeNotices.length" class="user-notice-list">
+            <div
+              v-for="item in userHomeNotices"
+              :key="item.noticeId"
+              class="user-notice-row"
+              @click="showNoticeContent(item)"
+            >
+              <span class="notice-title-text">{{ item.noticeTitle }}</span>
+              <span class="notice-time">{{ parseTime(item.createTime, '{y}-{m}-{d} {h}:{i}') }}</span>
+              <i class="el-icon-arrow-right notice-arrow"></i>
+            </div>
+          </div>
+          <el-empty v-else description="暂无通知公告" :image-size="64"></el-empty>
+        </el-card>
+
         <!-- 轮播图和MBTI测试区域 -->
         <el-row :gutter="20" class="top-section">
           <el-col :span="18">
@@ -224,7 +245,7 @@
 </template>
 
 <script>
-import {listNotice, getNotice} from "@/api/system/notice";
+import {listNotice, getNotice, getPublicNotice} from "@/api/system/notice";
 import {recommendMajors} from "@/api/university/recommendation";
 import * as echarts from 'echarts'
 
@@ -236,6 +257,8 @@ export default {
       isAdmin: false,
       currentDate: '',
       recentNotices: [],
+      /** 普通用户首页：近期 5 条正常状态公告 */
+      userHomeNotices: [],
       // 遮罩层
       loading: true,
       ids: [],
@@ -273,8 +296,12 @@ export default {
     };
   },
   created() {
-    this.getList();
     this.getInfo();
+    if (this.isAdmin) {
+      this.getList();
+    } else {
+      this.getUserHomeNotices();
+    }
     this.setCurrentDate();
     this.fetchRecommendedMajors();
   },
@@ -316,13 +343,30 @@ export default {
         this.loading = false;
       });
     },
+    /** 普通用户首页：仅拉取状态为「正常」的最近 5 条 */
+    getUserHomeNotices() {
+      listNotice({
+        pageNum: 1,
+        pageSize: 5,
+        status: '0'
+      }).then((response) => {
+        this.userHomeNotices = response.rows || [];
+      }).catch(() => {
+        this.userHomeNotices = [];
+      });
+    },
     showNoticeContent(row) {
+      const api = this.isAdmin ? getNotice : getPublicNotice;
       this.loading = true;
-      getNotice(row.noticeId).then((response) => {
-        this.selectedNotice.title = response.data.noticeTitle;
-        this.selectedNotice.content = response.data.noticeContent;
+      api(row.noticeId).then((response) => {
+        const data = response.data;
+        this.selectedNotice.title = data.noticeTitle;
+        this.selectedNotice.content = data.noticeContent;
         this.showNoticeDialog = true;
         this.loading = false;
+      }).catch(() => {
+        this.loading = false;
+        this.$message.error('加载公告失败');
       });
     },
     initEchartsText() {
@@ -631,6 +675,72 @@ export default {
     width: 100%;
     height: 3px;
     background: #1a5fb4;
+  }
+}
+
+.user-notice-card {
+  margin-bottom: 20px;
+  border: 1px solid #e4e7ed;
+
+  .user-notice-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+
+    i {
+      margin-right: 8px;
+      color: #1a5fb4;
+    }
+
+    .user-notice-sub {
+      font-size: 12px;
+      font-weight: 400;
+      color: #909399;
+    }
+  }
+
+  .user-notice-list {
+    .user-notice-row {
+      display: flex;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background: #f5f9ff;
+      }
+
+      .notice-title-text {
+        flex: 1;
+        font-size: 14px;
+        color: #303133;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-right: 12px;
+      }
+
+      .notice-time {
+        font-size: 12px;
+        color: #909399;
+        flex-shrink: 0;
+      }
+
+      .notice-arrow {
+        margin-left: 8px;
+        color: #c0c4cc;
+        font-size: 12px;
+      }
+    }
   }
 }
 
