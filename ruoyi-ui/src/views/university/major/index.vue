@@ -33,13 +33,21 @@
 
     <!-- 专业列表 -->
     <el-table :data="majorList" v-loading="loading" border style="width: 100%">
-      <el-table-column label="专业名称" prop="majorName" align="center" min-width="140"></el-table-column>
       <el-table-column label="院校名称" prop="universityName" align="center" min-width="160"></el-table-column>
+      <el-table-column label="专业名称" prop="majorName" align="center" min-width="140"></el-table-column>
       <el-table-column label="所学科目" prop="subject" align="center" width="90">
         <template #default="scope">
           <span>{{ scope.row.subject === 1 ? '历史类' : '物理类' }}</span>
         </template>
       </el-table-column>
+      <el-table-column
+        label="说明"
+        prop="description"
+        align="left"
+        min-width="220"
+        show-overflow-tooltip
+        :formatter="formatDescription"
+      />
       <el-table-column label="2023投档线" prop="minScore2023" align="center" width="100">
         <template #default="scope">
           <span>{{ formatScore(scope.row.minScore2023) }}</span>
@@ -107,6 +115,12 @@ export default {
     formatScore(val) {
       if (val === null || val === undefined || val === '') return '-';
       return val;
+    },
+    formatDescription(row, column, cellValue) {
+      if (cellValue === null || cellValue === undefined || cellValue === '') {
+        return '-';
+      }
+      return cellValue;
     },
     fetchMajors() {
       this.loading = true;
