@@ -169,8 +169,8 @@
                         <div class="card-major">{{ item.majorName }}</div>
                       </div>
                       <div class="card-footer">
-                        <span class="score-label">分数线</span>
-                        <span class="score-value">{{ item.minScore2024 }}分</span>
+                        <span class="score-label">2025年分数线</span>
+                        <span class="score-value">{{ item.minScore2025 != null ? item.minScore2025 + '分' : '-' }}</span>
                       </div>
                     </el-card>
                   </el-col>

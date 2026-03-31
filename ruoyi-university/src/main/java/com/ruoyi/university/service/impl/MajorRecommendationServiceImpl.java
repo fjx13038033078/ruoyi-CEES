@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @Author 范佳兴
@@ -94,6 +93,10 @@ public class MajorRecommendationServiceImpl implements MajorRecommendationServic
         if (recommendedMajorIds!= null && !recommendedMajorIds.isEmpty()) {
             // 获取推荐的专业详情
             List<Major> recommendedMajors = majorMapper.selectByIds(recommendedMajorIds);
+            // 无 2025 年投档线的专业不参与推荐
+            recommendedMajors = recommendedMajors.stream()
+                    .filter(m -> m.getMinScore2025() != null)
+                    .collect(Collectors.toList());
 
             // 获取高校信息用于批量填充高校名称
             List<University> allUniversities = universityService.getAllUniversities(null);
@@ -165,12 +168,13 @@ public class MajorRecommendationServiceImpl implements MajorRecommendationServic
         log.info("用户画像信息 - 学科类别: {}, 高校层次: {}, 分数: {}", 
                 userInfo.getSubject(), userInfo.getUniversityLevel(), userInfo.getScore());
 
-        // 1. 过滤出符合用户学科类别的专业
+        // 1. 过滤出符合用户学科类别、且具备 2025 年投档线的专业
         List<Major> filteredBySubject = majorList.stream()
                 .filter(major -> major.getSubject().equals(userInfo.getSubject()))
+                .filter(major -> major.getMinScore2025() != null)
                 .collect(Collectors.toList());
         
-        log.info("按学科类别过滤后剩余 {} 个专业", filteredBySubject.size());
+        log.info("按学科类别与 2025 投档线过滤后剩余 {} 个专业", filteredBySubject.size());
 
         // 2. 过滤符合用户目标高校层次的专业
         List<Major> filteredByLevel = filteredBySubject.stream()
@@ -206,25 +210,22 @@ public class MajorRecommendationServiceImpl implements MajorRecommendationServic
         return finalRecommendations;
     }
 
-    /**
-     * 根据分数范围获取专业，并进行智能排序
-     */
-    private static Integer getLatestScore(Major major) {
-        if (major.getMinScore2025() != null) return major.getMinScore2025();
-        return major.getMinScore2024();
+    /** 推荐算法统一使用 2025 年投档线（无则不应进入候选集） */
+    private static Integer getRecommendationScore(Major major) {
+        return major.getMinScore2025();
     }
 
     private List<Major> getScoreRangeMajors(List<Major> majors, Integer userScore, int minOffset, int maxOffset, int limit) {
         return majors.stream()
                 .filter(major -> {
-                    Integer score = getLatestScore(major);
+                    Integer score = getRecommendationScore(major);
                     if (score == null) return false;
                     int scoreDiff = score - userScore;
                     return scoreDiff >= minOffset && scoreDiff <= maxOffset;
                 })
                 .sorted((m1, m2) -> {
-                    int scoreDiff1 = Math.abs(getLatestScore(m1) - userScore);
-                    int scoreDiff2 = Math.abs(getLatestScore(m2) - userScore);
+                    int scoreDiff1 = Math.abs(getRecommendationScore(m1) - userScore);
+                    int scoreDiff2 = Math.abs(getRecommendationScore(m2) - userScore);
                     int scoreComparison = Integer.compare(scoreDiff1, scoreDiff2);
                     if (scoreComparison != 0) {
                         return scoreComparison;
@@ -302,19 +303,18 @@ public class MajorRecommendationServiceImpl implements MajorRecommendationServic
             }
         }
 
-        // 4. 按综合评分排序并限制数量
+        // 4. 按综合评分排序，剔除无 2025 投档线的专业后再限制数量
         List<Major> finalResults = scoredMajors.values().stream()
                 .sorted((a, b) -> {
-                    // 首先按评分排序
                     int scoreComparison = Double.compare(b.getScore(), a.getScore());
                     if (scoreComparison != 0) {
                         return scoreComparison;
                     }
-                    // 评分相同时按原始排名排序
                     return Integer.compare(a.getRank(), b.getRank());
                 })
-                .limit(MAX_FINAL_RECOMMENDATIONS)
                 .map(MajorWithScore::getMajor)
+                .filter(m -> m.getMinScore2025() != null)
+                .limit(MAX_FINAL_RECOMMENDATIONS)
                 .collect(Collectors.toList());
 
         log.info("最终融合推荐 {} 个专业", finalResults.size());
