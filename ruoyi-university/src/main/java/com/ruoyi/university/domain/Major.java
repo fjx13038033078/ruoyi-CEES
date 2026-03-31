@@ -21,39 +21,35 @@ import java.io.Serializable;
 @ToString
 @RequiredArgsConstructor
 public class Major implements Serializable {
-    /**
-     * 专业ID，主键，自增
-     */
+
     @TableId(type = IdType.AUTO)
     private Long majorId;
 
-    /**
-     * 学校ID，外键关联到高校表
-     */
     private Long universityId;
 
     @TableField(exist = false)
     private String universityName;
 
-    /**
-     * 专业名称
-     */
+    /** 专业编号 */
+    private Integer majorNum;
+
+    /** 专业组名称 */
     private String majorName;
 
-    /**
-     * 报名科目（1-历史类，2-物理类）
-     */
+    /** 报名科目（1-历史类，2-物理类） */
     private Integer subject;
 
-    /**
-     * 2024年投档线
-     */
+    /** 备注 */
+    private String description;
+
+    /** 2023年投档线 */
+    private Integer minScore2023;
+
+    /** 2024年投档线 */
     private Integer minScore2024;
 
-    /**
-     * 专业简介
-     */
-    private String description;
+    /** 2025年投档线 */
+    private Integer minScore2025;
 
     @TableField(exist = false)
     private String keyword;

@@ -21,51 +21,32 @@ import java.io.Serializable;
 @ToString
 @RequiredArgsConstructor
 public class University implements Serializable {
-    /**
-     * 高校ID，主键，自增
-     */
+
     @TableId(type = IdType.AUTO)
     private Long universityId;
 
-    /**
-     * 高校名称
-     */
     private String universityName;
 
-    /**
-     * 所在省份
-     */
     private String location;
 
-    /**
-     * 高校排名
-     */
-    private Integer ranking;
+    /** 所在城市 */
+    private String city;
 
-    /**
-     * 高校类型（如理工、综合、医学等）
-     */
-    private String type;
+    /** 高校类型（0-公办，1-民办） */
+    private Integer type;
 
-    /**
-     * 是否985（0-否，1-是）
-     */
     private Integer is985;
 
-    /**
-     * 是否211（0-否，1-是）
-     */
     private Integer is211;
 
-    /**
-     * 2024年历史类最低投档线
-     */
-    private Integer minScoreLiberal;
+    /** 是否双一流（0-否，1-是） */
+    private Integer isDoubleFirst;
 
-    /**
-     * 2024年物理类最低投档线
-     */
-    private Integer minScoreScience;
+    /** 高校层次（0-本科，1-专科） */
+    private Integer level;
+
+    /** 院校官网 */
+    private String webUrl;
 
     @TableField(exist = false)
     private String keyword;

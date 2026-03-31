@@ -17,12 +17,13 @@
                 <span class="uni-location">{{ uni.location }}</span>
                 <el-tag v-if="uni.is985" size="mini" type="danger">985</el-tag>
                 <el-tag v-if="uni.is211" size="mini">211</el-tag>
+                <el-tag v-if="uni.isDoubleFirst" size="mini" type="warning">双一流</el-tag>
                 <i :class="expandedUni === uni.universityId ? 'el-icon-arrow-up' : 'el-icon-arrow-down'"></i>
               </div>
               <div v-if="expandedUni === uni.universityId" class="major-list">
                 <div v-for="m in majorList" :key="m.majorId" class="major-item" @click="addToVolunteer(uni, m)">
                   <span>{{ m.majorName }}</span>
-                  <span class="score-tag">{{ m.minScore2024 ? m.minScore2024 + '分' : '-' }}</span>
+                  <span class="score-tag">{{ (m.minScore2025 || m.minScore2024) ? (m.minScore2025 || m.minScore2024) + '分' : '-' }}</span>
                   <el-button type="text" size="mini" icon="el-icon-plus">添加</el-button>
                 </div>
               </div>
@@ -93,7 +94,7 @@
       <p>院校：<b>{{ selectedUni ? selectedUni.universityName : '' }}</b></p>
       <el-checkbox-group v-model="selectedMajorIds" :max="6">
         <div v-for="m in dialogMajorList" :key="m.majorId" class="major-check-item">
-          <el-checkbox :label="m.majorId">{{ m.majorName }} ({{ m.minScore2024 || '-' }}分)</el-checkbox>
+          <el-checkbox :label="m.majorId">{{ m.majorName }} ({{ m.minScore2025 || m.minScore2024 || '-' }}分)</el-checkbox>
         </div>
       </el-checkbox-group>
       <div style="margin-top:15px">

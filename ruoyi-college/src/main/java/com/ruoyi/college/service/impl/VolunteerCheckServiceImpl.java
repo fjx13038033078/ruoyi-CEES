@@ -117,8 +117,10 @@ public class VolunteerCheckServiceImpl implements IVolunteerCheckService {
     }
 
     private void checkScore(StudentProfile profile, Major major, VolunteerCheckResultDTO dto) {
-        if (profile.getTotalScore() == null || major.getMinScore2024() == null) return;
-        int diff = profile.getTotalScore() - major.getMinScore2024();
+        if (profile.getTotalScore() == null) return;
+        Integer baseline = major.getMinScore2025() != null ? major.getMinScore2025() : major.getMinScore2024();
+        if (baseline == null) return;
+        int diff = profile.getTotalScore() - baseline;
         if (diff < 0) {
             dto.addMessage(String.format("分数未达投档线（差%d分），不可填报", Math.abs(diff)));
         } else if (diff <= 10) {

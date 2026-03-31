@@ -210,9 +210,10 @@ public class HollandAssessmentServiceImpl implements IHollandAssessmentService {
                     }
                     List<Major> majors = majorMapper.getAllMajors(query);
                     for (Major m : majors) {
+                        Integer baseline = m.getMinScore2025() != null ? m.getMinScore2025() : m.getMinScore2024();
                         boolean scoreOk = true;
-                        if (profile != null && profile.getTotalScore() != null && m.getMinScore2024() != null) {
-                            scoreOk = profile.getTotalScore() >= m.getMinScore2024() - 20;
+                        if (profile != null && profile.getTotalScore() != null && baseline != null) {
+                            scoreOk = profile.getTotalScore() >= baseline - 20;
                         }
                         if (scoreOk && matchedMajors.size() < 5) {
                             Map<String, Object> mInfo = new HashMap<>();
@@ -221,6 +222,7 @@ public class HollandAssessmentServiceImpl implements IHollandAssessmentService {
                             mInfo.put("universityId", m.getUniversityId());
                             mInfo.put("universityName", m.getUniversityName());
                             mInfo.put("minScore2024", m.getMinScore2024());
+                            mInfo.put("minScore2025", m.getMinScore2025());
                             matchedMajors.add(mInfo);
                         }
                     }

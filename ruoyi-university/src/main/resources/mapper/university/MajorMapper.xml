@@ -5,13 +5,15 @@
     <resultMap type="com.ruoyi.university.domain.Major" id="MajorResult">
         <id property="majorId" column="major_id"/>
         <result property="universityId" column="university_id"/>
+        <result property="majorNum" column="major_num"/>
         <result property="majorName" column="major_name"/>
         <result property="subject" column="subject"/>
-        <result property="minScore2024" column="min_score_2024"/>
         <result property="description" column="description"/>
+        <result property="minScore2023" column="min_score_2023"/>
+        <result property="minScore2024" column="min_score_2024"/>
+        <result property="minScore2025" column="min_score_2025"/>
     </resultMap>
 
-    <!-- 获取所有专业信息 -->
     <!-- 根据条件查询专业信息 -->
     <select id="getAllMajors" parameterType="map" resultMap="MajorResult">
         SELECT * FROM cers_major
@@ -50,21 +52,23 @@
         </foreach>
     </select>
 
-
     <!-- 添加专业信息 -->
     <insert id="addMajor" parameterType="com.ruoyi.university.domain.Major">
-        INSERT INTO cers_major (university_id, major_name, subject, min_score_2024, description)
-        VALUES (#{universityId}, #{majorName}, #{subject}, #{minScore2024}, #{description})
+        INSERT INTO cers_major (university_id, major_num, major_name, subject, description, min_score_2023, min_score_2024, min_score_2025)
+        VALUES (#{universityId}, #{majorNum}, #{majorName}, #{subject}, #{description}, #{minScore2023}, #{minScore2024}, #{minScore2025})
     </insert>
 
     <!-- 更新专业信息 -->
     <update id="updateMajor" parameterType="com.ruoyi.university.domain.Major">
         UPDATE cers_major
         SET university_id = #{universityId},
+            major_num = #{majorNum},
             major_name = #{majorName},
             subject = #{subject},
+            description = #{description},
+            min_score_2023 = #{minScore2023},
             min_score_2024 = #{minScore2024},
-            description = #{description}
+            min_score_2025 = #{minScore2025}
         WHERE major_id = #{majorId}
     </update>
 

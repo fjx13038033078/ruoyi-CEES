@@ -8,25 +8,22 @@
         <id property="universityId" column="university_id"/>
         <result property="universityName" column="university_name"/>
         <result property="location" column="location"/>
-        <result property="ranking" column="ranking"/>
+        <result property="city" column="city"/>
         <result property="type" column="type"/>
         <result property="is985" column="is_985"/>
         <result property="is211" column="is_211"/>
-        <result property="minScoreLiberal" column="min_score_liberal"/>
-        <result property="minScoreScience" column="min_score_science"/>
+        <result property="isDoubleFirst" column="is_double_first"/>
+        <result property="level" column="level"/>
+        <result property="webUrl" column="web_url"/>
     </resultMap>
-
-    <!-- 获取所有高校信息 -->
-<!--    <select id="getAllUniversities" resultMap="UniversityResult">-->
-<!--        SELECT * FROM cers_university-->
-<!--    </select>-->
 
     <select id="getAllUniversities" parameterType="map" resultMap="UniversityResult">
         SELECT * FROM cers_university
         WHERE 1=1
         <if test="keyword != null and keyword != ''">
             AND (university_name LIKE CONCAT('%', #{keyword}, '%')
-            OR location LIKE CONCAT('%', #{keyword}, '%'))
+            OR location LIKE CONCAT('%', #{keyword}, '%')
+            OR city LIKE CONCAT('%', #{keyword}, '%'))
         </if>
         <if test="is985 != null">
             AND is_985 = #{is985}
@@ -34,35 +31,41 @@
         <if test="is211 != null">
             AND is_211 = #{is211}
         </if>
-        ORDER BY ranking ASC
+        <if test="isDoubleFirst != null">
+            AND is_double_first = #{isDoubleFirst}
+        </if>
+        <if test="type != null">
+            AND type = #{type}
+        </if>
+        <if test="level != null">
+            AND level = #{level}
+        </if>
+        ORDER BY university_id ASC
     </select>
 
-    <!-- 根据高校ID获取高校信息 -->
     <select id="getUniversityById" parameterType="Long" resultMap="UniversityResult">
         SELECT * FROM cers_university WHERE university_id = #{universityId}
     </select>
 
-    <!-- 添加高校信息 -->
     <insert id="addUniversity" parameterType="com.ruoyi.university.domain.University">
-        INSERT INTO cers_university (university_name, location, ranking, type, is_985, is_211, min_score_liberal, min_score_science)
-        VALUES (#{universityName}, #{location}, #{ranking}, #{type}, #{is985}, #{is211}, #{minScoreLiberal}, #{minScoreScience})
+        INSERT INTO cers_university (university_name, location, city, type, is_985, is_211, is_double_first, level, web_url)
+        VALUES (#{universityName}, #{location}, #{city}, #{type}, #{is985}, #{is211}, #{isDoubleFirst}, #{level}, #{webUrl})
     </insert>
 
-    <!-- 更新高校信息 -->
     <update id="updateUniversity" parameterType="com.ruoyi.university.domain.University">
         UPDATE cers_university
         SET university_name = #{universityName},
             location = #{location},
-            ranking = #{ranking},
+            city = #{city},
             type = #{type},
             is_985 = #{is985},
             is_211 = #{is211},
-            min_score_liberal = #{minScoreLiberal},
-            min_score_science = #{minScoreScience}
+            is_double_first = #{isDoubleFirst},
+            level = #{level},
+            web_url = #{webUrl}
         WHERE university_id = #{universityId}
     </update>
 
-    <!-- 删除高校信息 -->
     <delete id="deleteUniversity" parameterType="Long">
         DELETE FROM cers_university WHERE university_id = #{universityId}
     </delete>

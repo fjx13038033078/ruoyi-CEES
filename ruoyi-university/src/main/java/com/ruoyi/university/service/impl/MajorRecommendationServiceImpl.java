@@ -209,24 +209,26 @@ public class MajorRecommendationServiceImpl implements MajorRecommendationServic
     /**
      * 根据分数范围获取专业，并进行智能排序
      */
+    private static Integer getLatestScore(Major major) {
+        if (major.getMinScore2025() != null) return major.getMinScore2025();
+        return major.getMinScore2024();
+    }
+
     private List<Major> getScoreRangeMajors(List<Major> majors, Integer userScore, int minOffset, int maxOffset, int limit) {
         return majors.stream()
                 .filter(major -> {
-                    int scoreDiff = major.getMinScore2024() - userScore;
+                    Integer score = getLatestScore(major);
+                    if (score == null) return false;
+                    int scoreDiff = score - userScore;
                     return scoreDiff >= minOffset && scoreDiff <= maxOffset;
                 })
                 .sorted((m1, m2) -> {
-                    // 多维度排序：优先考虑分数接近度，然后考虑专业热度等
-                    int scoreDiff1 = Math.abs(m1.getMinScore2024() - userScore);
-                    int scoreDiff2 = Math.abs(m2.getMinScore2024() - userScore);
-                    
-                    // 首先按分数接近度排序
+                    int scoreDiff1 = Math.abs(getLatestScore(m1) - userScore);
+                    int scoreDiff2 = Math.abs(getLatestScore(m2) - userScore);
                     int scoreComparison = Integer.compare(scoreDiff1, scoreDiff2);
                     if (scoreComparison != 0) {
                         return scoreComparison;
                     }
-                    
-                    // 分数相同时，可以按其他因素排序（这里简化为按专业ID）
                     return Long.compare(m1.getMajorId(), m2.getMajorId());
                 })
                 .limit(limit)
