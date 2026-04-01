@@ -293,34 +293,37 @@ public class MajorRecommendationServiceImpl implements MajorRecommendationServic
         }
 
         // 冲刺：投档线高于用户成绩 1~40 分（概率低）
-        List<Major> reachList = candidates.stream()
-                .filter(m -> {
-                    int diff = m.getMinScore2025() - userScore;
-                    return diff > 0 && diff <= 40;
-                })
-                .sorted((a, b) -> Integer.compare(a.getMinScore2025() - userScore, b.getMinScore2025() - userScore))
-                .limit(limit)
-                .collect(Collectors.toList());
+        List<Major> reachList = distinctTierMajors(
+                candidates.stream()
+                        .filter(m -> {
+                            int diff = m.getMinScore2025() - userScore;
+                            return diff > 0 && diff <= 40;
+                        })
+                        .sorted((a, b) -> Integer.compare(a.getMinScore2025() - userScore, b.getMinScore2025() - userScore))
+                        .collect(Collectors.toList()),
+                limit);
 
         // 稳妥：用户成绩超投档线 0~20 分
-        List<Major> matchList = candidates.stream()
-                .filter(m -> {
-                    int diff = userScore - m.getMinScore2025();
-                    return diff >= 0 && diff <= 20;
-                })
-                .sorted((a, b) -> Integer.compare(userScore - a.getMinScore2025(), userScore - b.getMinScore2025()))
-                .limit(limit)
-                .collect(Collectors.toList());
+        List<Major> matchList = distinctTierMajors(
+                candidates.stream()
+                        .filter(m -> {
+                            int diff = userScore - m.getMinScore2025();
+                            return diff >= 0 && diff <= 20;
+                        })
+                        .sorted((a, b) -> Integer.compare(userScore - a.getMinScore2025(), userScore - b.getMinScore2025()))
+                        .collect(Collectors.toList()),
+                limit);
 
         // 保底：用户成绩超投档线 21~60 分
-        List<Major> safeList = candidates.stream()
-                .filter(m -> {
-                    int diff = userScore - m.getMinScore2025();
-                    return diff > 20 && diff <= 60;
-                })
-                .sorted((a, b) -> Integer.compare(userScore - a.getMinScore2025(), userScore - b.getMinScore2025()))
-                .limit(limit)
-                .collect(Collectors.toList());
+        List<Major> safeList = distinctTierMajors(
+                candidates.stream()
+                        .filter(m -> {
+                            int diff = userScore - m.getMinScore2025();
+                            return diff > 20 && diff <= 60;
+                        })
+                        .sorted((a, b) -> Integer.compare(userScore - a.getMinScore2025(), userScore - b.getMinScore2025()))
+                        .collect(Collectors.toList()),
+                limit);
 
         fillUniversityNameBatch(reachList, universityMap);
         fillUniversityNameBatch(matchList, universityMap);
@@ -332,6 +335,34 @@ public class MajorRecommendationServiceImpl implements MajorRecommendationServic
         result.put("match", buildTieredItems(matchList, userScore, "match"));
         result.put("safe", buildTieredItems(safeList, userScore, "safe"));
         return result;
+    }
+
+    /**
+     * 同一梯度内去重：同一院校下相同专业名称只保留一条（按已排序顺序取前 limit 条），
+     * 避免数据源重复行或多条同名专业导致列表重复展示。
+     */
+    private List<Major> distinctTierMajors(List<Major> sorted, int limit) {
+        if (sorted == null || sorted.isEmpty() || limit <= 0) {
+            return sorted == null ? Collections.emptyList() : sorted;
+        }
+        Set<String> seen = new LinkedHashSet<>();
+        List<Major> out = new ArrayList<>();
+        for (Major m : sorted) {
+            String key = tierMajorDedupKey(m);
+            if (seen.add(key)) {
+                out.add(m);
+                if (out.size() >= limit) {
+                    break;
+                }
+            }
+        }
+        return out;
+    }
+
+    private static String tierMajorDedupKey(Major m) {
+        Long uid = m.getUniversityId();
+        String name = m.getMajorName() == null ? "" : m.getMajorName().trim().replaceAll("\\s+", " ");
+        return String.valueOf(uid) + "\u0001" + name;
     }
 
     private List<Map<String, Object>> buildTieredItems(List<Major> majors, int userScore, String tier) {
