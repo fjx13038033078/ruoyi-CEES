@@ -6,3 +6,11 @@ export function recommendMajors() {
     method: 'get',
   })
 }
+
+export function getTieredRecommendations(limit) {
+  return request({
+    url: '/university/recommendation/tiered',
+    method: 'get',
+    params: { limit }
+  })
+}

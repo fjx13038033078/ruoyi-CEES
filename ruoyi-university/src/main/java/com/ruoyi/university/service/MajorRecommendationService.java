@@ -3,6 +3,7 @@ package com.ruoyi.university.service;
 import com.ruoyi.university.domain.Major;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author 范佳兴
@@ -16,5 +17,10 @@ public interface MajorRecommendationService {
      */
     List<Major> recommendMajors();
 
-    public List<Major> getCombinedRecommendations();
+    List<Major> getCombinedRecommendations();
+
+    /**
+     * 按冲刺/稳妥/保底三梯度推荐，每梯度最多 limit 个，附带录取概率
+     */
+    Map<String, Object> getTieredRecommendations(int limit);
 }

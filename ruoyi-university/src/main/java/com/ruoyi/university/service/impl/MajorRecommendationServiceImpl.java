@@ -257,6 +257,115 @@ public class MajorRecommendationServiceImpl implements MajorRecommendationServic
         }
     }
 
+    @Override
+    public Map<String, Object> getTieredRecommendations(int limit) {
+        Long userId = SecurityUtils.getUserId();
+        Information userInfo = informationService.getInformationByUserId(userId);
+        if (userInfo == null || userInfo.getScore() == null || userInfo.getSubject() == null) {
+            return Collections.emptyMap();
+        }
+
+        int userScore = userInfo.getScore();
+
+        List<Major> allMajors = majorMapper.getAllMajors(null);
+        if (allMajors == null || allMajors.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<University> allUniversities = universityService.getAllUniversities(null);
+        Map<Long, University> universityMap = allUniversities.stream()
+                .collect(Collectors.toMap(University::getUniversityId, u -> u));
+
+        // 基础过滤：学科匹配 + 有 2025 投档线
+        List<Major> candidates = allMajors.stream()
+                .filter(m -> m.getSubject().equals(userInfo.getSubject()))
+                .filter(m -> m.getMinScore2025() != null)
+                .collect(Collectors.toList());
+
+        // 若设置了目标层次，进一步过滤
+        if (userInfo.getUniversityLevel() != null) {
+            List<Major> levelFiltered = candidates.stream()
+                    .filter(m -> isUniversityLevelMatch(universityMap.get(m.getUniversityId()), userInfo.getUniversityLevel()))
+                    .collect(Collectors.toList());
+            if (levelFiltered.size() >= limit) {
+                candidates = levelFiltered;
+            }
+        }
+
+        // 冲刺：投档线高于用户成绩 1~40 分（概率低）
+        List<Major> reachList = candidates.stream()
+                .filter(m -> {
+                    int diff = m.getMinScore2025() - userScore;
+                    return diff > 0 && diff <= 40;
+                })
+                .sorted((a, b) -> Integer.compare(a.getMinScore2025() - userScore, b.getMinScore2025() - userScore))
+                .limit(limit)
+                .collect(Collectors.toList());
+
+        // 稳妥：用户成绩超投档线 0~20 分
+        List<Major> matchList = candidates.stream()
+                .filter(m -> {
+                    int diff = userScore - m.getMinScore2025();
+                    return diff >= 0 && diff <= 20;
+                })
+                .sorted((a, b) -> Integer.compare(userScore - a.getMinScore2025(), userScore - b.getMinScore2025()))
+                .limit(limit)
+                .collect(Collectors.toList());
+
+        // 保底：用户成绩超投档线 21~60 分
+        List<Major> safeList = candidates.stream()
+                .filter(m -> {
+                    int diff = userScore - m.getMinScore2025();
+                    return diff > 20 && diff <= 60;
+                })
+                .sorted((a, b) -> Integer.compare(userScore - a.getMinScore2025(), userScore - b.getMinScore2025()))
+                .limit(limit)
+                .collect(Collectors.toList());
+
+        fillUniversityNameBatch(reachList, universityMap);
+        fillUniversityNameBatch(matchList, universityMap);
+        fillUniversityNameBatch(safeList, universityMap);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("userScore", userScore);
+        result.put("reach", buildTieredItems(reachList, userScore, "reach"));
+        result.put("match", buildTieredItems(matchList, userScore, "match"));
+        result.put("safe", buildTieredItems(safeList, userScore, "safe"));
+        return result;
+    }
+
+    private List<Map<String, Object>> buildTieredItems(List<Major> majors, int userScore, String tier) {
+        List<Map<String, Object>> items = new ArrayList<>();
+        for (Major m : majors) {
+            int scoreLine = m.getMinScore2025();
+            int diff = userScore - scoreLine;
+            int probability;
+            String level;
+            if ("reach".equals(tier)) {
+                probability = Math.max(10, 45 - Math.abs(diff) * 2);
+                level = "低";
+            } else if ("match".equals(tier)) {
+                probability = Math.min(85, 60 + diff);
+                level = "中";
+            } else {
+                probability = Math.min(99, 80 + diff / 2);
+                level = "高";
+            }
+
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("majorId", m.getMajorId());
+            item.put("majorName", m.getMajorName());
+            item.put("universityId", m.getUniversityId());
+            item.put("universityName", m.getUniversityName());
+            item.put("minScore2025", scoreLine);
+            item.put("scoreDiff", diff);
+            item.put("probability", probability);
+            item.put("probabilityLevel", level);
+            items.add(item);
+        }
+        return items;
+    }
+
     /**
      * 智能融合两种推荐结果
      */

@@ -9,6 +9,7 @@ import com.ruoyi.university.service.MajorRecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
@@ -33,5 +34,17 @@ public class MajorRecommendationController extends BaseController {
     public AjaxResult recommendMajors() {
         List<Major> majors = majorRecommendationService.recommendMajors();
         return success(majors);
+    }
+
+    /**
+     * 冲刺/稳妥/保底 三梯度推荐
+     */
+    @GetMapping("/tiered")
+    public AjaxResult tieredRecommendations(@RequestParam(defaultValue = "10") Integer limit) {
+        java.util.Map<String, Object> result = majorRecommendationService.getTieredRecommendations(limit);
+        if (result == null || result.isEmpty()) {
+            return error("请先完善个人信息（学科类型和高考成绩）");
+        }
+        return success(result);
     }
 }
