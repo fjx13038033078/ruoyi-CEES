@@ -12,6 +12,11 @@ public interface IStudentProfileService {
 
     StudentProfile selectByProfileId(Long profileId);
 
+    /**
+     * 按身份证号查询考生档案（用于注册唯一性校验等）
+     */
+    StudentProfile selectByIdCard(String idCard);
+
     int createProfile(StudentProfile profile);
 
     int updateProfile(StudentProfile profile);

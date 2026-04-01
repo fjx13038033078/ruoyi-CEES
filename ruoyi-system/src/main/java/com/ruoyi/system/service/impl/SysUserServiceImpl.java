@@ -143,6 +143,12 @@ public class SysUserServiceImpl implements ISysUserService
         return userMapper.selectUserByUserName(userName);
     }
 
+    @Override
+    public SysUser selectUserByIdCard(String idCard)
+    {
+        return userMapper.selectUserByIdCard(idCard);
+    }
+
     /**
      * 通过用户ID查询用户
      * 

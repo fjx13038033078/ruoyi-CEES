@@ -132,6 +132,11 @@ public class SysUser extends BaseEntity {
     private String userType;
 
     /**
+     * 身份证号（家长注册等场景写入，考生档案见 cers_student_profile）
+     */
+    private String idCard;
+
+    /**
      * 余额
      */
     private BigDecimal balance;
@@ -170,6 +175,14 @@ public class SysUser extends BaseEntity {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public String getIdCard() {
+        return idCard;
+    }
+
+    public void setIdCard(String idCard) {
+        this.idCard = idCard;
     }
 
     public void setBalance(BigDecimal balance) {

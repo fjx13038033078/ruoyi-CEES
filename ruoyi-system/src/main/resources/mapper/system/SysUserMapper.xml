@@ -24,6 +24,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"   column="update_time"  />
         <result property="remark"       column="remark"       />
 		<result property="balance"      column="balance"      />
+        <result property="idCard"       column="id_card"      />
         <association property="dept"    javaType="SysDept"         resultMap="deptResult" />
         <collection  property="roles"   javaType="java.util.List"  resultMap="RoleResult" />
     </resultMap>
@@ -48,7 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 	
 	<sql id="selectUserVo">
-        select u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.avatar, u.phonenumber, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, u.balance,
+        select u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.avatar, u.phonenumber, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, u.balance, u.id_card,
         d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.status as dept_status,
         r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope, r.status as role_status
         from sys_user u
@@ -197,6 +198,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where u.user_id = #{userId}
 	</select>
 	
+	<select id="selectUserByIdCard" parameterType="String" resultMap="SysUserResult">
+		select user_id, user_name, id_card, user_type from sys_user where id_card = #{idCard} and del_flag = '0' limit 1
+	</select>
+
 	<select id="checkUserNameUnique" parameterType="String" resultMap="SysUserResult">
 		select user_id, user_name from sys_user where user_name = #{userName} and del_flag = '0' limit 1
 	</select>
@@ -225,6 +230,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="remark != null and remark != ''">remark,</if>
 			<if test="balance != null and balance != ''">balance,</if>
 			<if test="userType != null and userType != ''">user_type,</if>
+			<if test="idCard != null and idCard != ''">id_card,</if>
  			create_time
  		)values(
  			<if test="userId != null and userId != ''">#{userId},</if>
@@ -241,6 +247,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="remark != null and remark != ''">#{remark},</if>
 			<if test="balance != null and balance != ''">#{balance},</if>
 			<if test="userType != null and userType != ''">#{userType},</if>
+			<if test="idCard != null and idCard != ''">#{idCard},</if>
  			sysdate()
  		)
 	</insert>

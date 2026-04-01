@@ -61,6 +61,14 @@ public interface SysUserMapper
     public SysUser selectUserByUserName(String userName);
 
     /**
+     * 通过身份证号查询用户（家长等）
+     *
+     * @param idCard 身份证号
+     * @return 用户对象信息
+     */
+    public SysUser selectUserByIdCard(String idCard);
+
+    /**
      * 通过用户ID查询用户
      * 
      * @param userId 用户ID

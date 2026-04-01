@@ -32,6 +32,11 @@ public class StudentProfileServiceImpl implements IStudentProfileService {
     }
 
     @Override
+    public StudentProfile selectByIdCard(String idCard) {
+        return studentProfileMapper.selectByIdCard(idCard);
+    }
+
+    @Override
     public int createProfile(StudentProfile profile) {
         if (profile.getVerifyStatus() == null) {
             profile.setVerifyStatus(0);
