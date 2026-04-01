@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.university.mapper.MajorDetailMapper">
+
+    <resultMap type="com.ruoyi.university.domain.MajorDetail" id="MajorDetailResult">
+        <id property="detailId" column="detail_id"/>
+        <result property="majorId" column="major_id"/>
+        <result property="specificMajorName" column="specific_major_name"/>
+        <result property="planCount" column="plan_count"/>
+        <result property="tuitionFee" column="tuition_fee"/>
+        <result property="studyYears" column="study_years"/>
+        <result property="requirements" column="requirements"/>
+    </resultMap>
+
+    <select id="selectByMajorId" parameterType="Long" resultMap="MajorDetailResult">
+        SELECT * FROM cers_major_detail WHERE major_id = #{majorId} ORDER BY detail_id
+    </select>
+
+</mapper>

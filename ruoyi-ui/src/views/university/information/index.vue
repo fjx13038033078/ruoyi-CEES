@@ -74,6 +74,9 @@
                       <span class="diff-tag diff-negative">高{{ Math.abs(item.scoreDiff) }}分</span>
                     </div>
                   </div>
+                  <div class="tier-item-actions">
+                    <el-button type="text" size="mini" @click="handleViewMajorDetail(item)">查看专业</el-button>
+                  </div>
                   <div class="tier-item-prob">
                     <el-progress type="circle" :percentage="item.probability" :width="48" :stroke-width="4" color="#F56C6C"></el-progress>
                   </div>
@@ -102,6 +105,9 @@
                       <span class="diff-tag diff-positive">超{{ item.scoreDiff }}分</span>
                     </div>
                   </div>
+                  <div class="tier-item-actions">
+                    <el-button type="text" size="mini" @click="handleViewMajorDetail(item)">查看专业</el-button>
+                  </div>
                   <div class="tier-item-prob">
                     <el-progress type="circle" :percentage="item.probability" :width="48" :stroke-width="4" color="#E6A23C"></el-progress>
                   </div>
@@ -129,6 +135,9 @@
                       <span>2025投档线：<b>{{ item.minScore2025 }}</b>分</span>
                       <span class="diff-tag diff-positive">超{{ item.scoreDiff }}分</span>
                     </div>
+                  </div>
+                  <div class="tier-item-actions">
+                    <el-button type="text" size="mini" @click="handleViewMajorDetail(item)">查看专业</el-button>
                   </div>
                   <div class="tier-item-prob">
                     <el-progress type="circle" :percentage="item.probability" :width="48" :stroke-width="4" color="#67C23A"></el-progress>
@@ -253,12 +262,40 @@
         <el-button @click="viewDialogVisible = false">关闭</el-button>
       </span>
     </el-dialog>
+
+    <!-- 专业组明细弹窗 -->
+    <el-dialog
+      :visible.sync="majorDetailDialogVisible"
+      :title="majorDetailDialogTitle"
+      width="750px"
+      append-to-body
+    >
+      <el-table :data="majorDetailList" v-loading="majorDetailLoading" border style="width: 100%">
+        <el-table-column label="具体专业名称" prop="specificMajorName" align="center" min-width="150"></el-table-column>
+        <el-table-column label="招生计划数" prop="planCount" align="center" width="100">
+          <template #default="scope">{{ scope.row.planCount != null ? scope.row.planCount : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="学费（元/年）" prop="tuitionFee" align="center" width="120">
+          <template #default="scope">{{ scope.row.tuitionFee != null ? scope.row.tuitionFee : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="学制" prop="studyYears" align="center" width="80">
+          <template #default="scope">{{ scope.row.studyYears || '-' }}</template>
+        </el-table-column>
+        <el-table-column label="备注" prop="requirements" align="left" min-width="180" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.requirements || '-' }}</template>
+        </el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="majorDetailDialogVisible = false">关闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { listAllInformation, getInformation, addInformation, updateInformation, deleteInformation } from "@/api/university/information";
 import { getTieredRecommendations } from "@/api/university/recommendation";
+import { getMajorDetails } from "@/api/university/major";
 
 export default {
   data() {
@@ -287,7 +324,11 @@ export default {
       },
       viewInfoForm: {},
       tieredLoading: false,
-      tieredData: { reach: [], match: [], safe: [], userScore: null }
+      tieredData: { reach: [], match: [], safe: [], userScore: null },
+      majorDetailDialogVisible: false,
+      majorDetailDialogTitle: '',
+      majorDetailLoading: false,
+      majorDetailList: []
     };
   },
   computed: {
@@ -384,6 +425,42 @@ export default {
           this.$message.success("删除成功");
           this.fetchInfoList();
         });
+      });
+    },
+    handleViewMajorDetail(item) {
+      this.majorDetailDialogTitle = (item.universityName || '') + ' - ' + (item.majorName || '') + ' 招收专业';
+      this.majorDetailDialogVisible = true;
+      this.majorDetailLoading = true;
+      this.majorDetailList = [];
+      getMajorDetails(item.majorId).then(res => {
+        this.majorDetailList = res.data || [];
+        this.majorDetailLoading = false;
+      }).catch(() => {
+        this.majorDetailLoading = false;
+      });
+    },
+    handleViewMajorDetail(item) {
+      this.majorDetailDialogTitle = (item.universityName || '') + ' - ' + (item.majorName || '') + ' 招收专业';
+      this.majorDetailDialogVisible = true;
+      this.majorDetailLoading = true;
+      this.majorDetailList = [];
+      getMajorDetails(item.majorId).then(res => {
+        this.majorDetailList = res.data || [];
+        this.majorDetailLoading = false;
+      }).catch(() => {
+        this.majorDetailLoading = false;
+      });
+    },
+    handleViewMajorDetail(item) {
+      this.majorDetailDialogTitle = (item.universityName || '') + ' - ' + (item.majorName || '') + ' 招收专业';
+      this.majorDetailDialogVisible = true;
+      this.majorDetailLoading = true;
+      this.majorDetailList = [];
+      getMajorDetails(item.majorId).then(res => {
+        this.majorDetailList = res.data || [];
+        this.majorDetailLoading = false;
+      }).catch(() => {
+        this.majorDetailLoading = false;
       });
     },
     clearForm() {
@@ -527,6 +604,17 @@ export default {
           color: #67C23A;
           background: rgba(103, 194, 58, 0.08);
         }
+      }
+    }
+
+    .tier-item-actions {
+      flex-shrink: 0;
+      margin-left: 4px;
+      margin-right: 4px;
+
+      .el-button--text {
+        font-size: 11px;
+        padding: 2px 0;
       }
     }
 

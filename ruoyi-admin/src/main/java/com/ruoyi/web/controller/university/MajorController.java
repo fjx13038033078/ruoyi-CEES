@@ -4,6 +4,8 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.university.domain.Major;
+import com.ruoyi.university.domain.MajorDetail;
+import com.ruoyi.university.service.MajorDetailService;
 import com.ruoyi.university.service.MajorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,8 @@ import java.util.List;
 public class MajorController extends BaseController {
 
     private final MajorService majorService;
+
+    private final MajorDetailService majorDetailService;
 
     /**
      * 获取所有专业列表
@@ -83,5 +87,16 @@ public class MajorController extends BaseController {
     @GetMapping("/delete")
     public AjaxResult deleteMajor(@RequestParam Long majorId) {
         return toAjax(majorService.deleteMajor(majorId));
+    }
+
+    /**
+     * 查询专业组下辖的具体专业明细
+     * @param majorId 专业组ID
+     * @return 具体专业明细列表
+     */
+    @GetMapping("/details")
+    public AjaxResult getMajorDetails(@RequestParam Long majorId) {
+        List<MajorDetail> details = majorDetailService.getDetailsByMajorId(majorId);
+        return success(details);
     }
 }

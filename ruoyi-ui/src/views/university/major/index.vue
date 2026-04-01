@@ -63,8 +63,13 @@
           <span>{{ formatScore(scope.row.minScore2025) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="120" fixed="right">
+      <el-table-column label="操作" align="center" width="200" fixed="right">
         <template #default="scope">
+          <el-button
+            type="primary"
+            size="mini"
+            @click="handleViewDetail(scope.row)"
+          >查看专业</el-button>
           <el-button
             type="success"
             size="mini"
@@ -82,11 +87,38 @@
       :limit.sync="queryParams.pageSize"
       @pagination="fetchMajors"
     />
+
+    <!-- 专业组明细弹窗 -->
+    <el-dialog
+      :visible.sync="detailDialogVisible"
+      :title="detailDialogTitle"
+      width="750px"
+      append-to-body
+    >
+      <el-table :data="majorDetailList" v-loading="detailLoading" border style="width: 100%">
+        <el-table-column label="具体专业名称" prop="specificMajorName" align="center" min-width="150"></el-table-column>
+        <el-table-column label="招生计划数" prop="planCount" align="center" width="100">
+          <template #default="scope">{{ scope.row.planCount != null ? scope.row.planCount : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="学费（元/年）" prop="tuitionFee" align="center" width="120">
+          <template #default="scope">{{ scope.row.tuitionFee != null ? scope.row.tuitionFee : '-' }}</template>
+        </el-table-column>
+        <el-table-column label="学制" prop="studyYears" align="center" width="80">
+          <template #default="scope">{{ scope.row.studyYears || '-' }}</template>
+        </el-table-column>
+        <el-table-column label="备注" prop="requirements" align="left" min-width="180" show-overflow-tooltip>
+          <template #default="scope">{{ scope.row.requirements || '-' }}</template>
+        </el-table-column>
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="detailDialogVisible = false">关闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listMajors } from "@/api/university/major";
+import { listMajors, getMajorDetails } from "@/api/university/major";
 import { addStoreup } from "@/api/university/storeup";
 
 export default {
@@ -105,7 +137,11 @@ export default {
         scoreYear: 2025,
         minScore: null,
         maxScore: null,
-      }
+      },
+      detailDialogVisible: false,
+      detailDialogTitle: '',
+      detailLoading: false,
+      majorDetailList: []
     };
   },
   created() {
@@ -147,6 +183,18 @@ export default {
         maxScore: null,
       };
       this.handleSearch();
+    },
+    handleViewDetail(row) {
+      this.detailDialogTitle = (row.universityName || '') + ' - ' + (row.majorName || '') + ' 招收专业';
+      this.detailDialogVisible = true;
+      this.detailLoading = true;
+      this.majorDetailList = [];
+      getMajorDetails(row.majorId).then(res => {
+        this.majorDetailList = res.data || [];
+        this.detailLoading = false;
+      }).catch(() => {
+        this.detailLoading = false;
+      });
     },
     handleStoreup(row) {
       const data = {

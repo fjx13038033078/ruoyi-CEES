@@ -53,3 +53,12 @@ export function deleteMajor(majorId) {
     params: {majorId}
   })
 }
+
+// 查询专业组下辖的具体专业明细
+export function getMajorDetails(majorId) {
+  return request({
+    url: '/university/major/details',
+    method: 'get',
+    params: { majorId }
+  })
+}
