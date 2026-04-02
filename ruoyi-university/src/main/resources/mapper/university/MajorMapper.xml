@@ -60,16 +60,16 @@
         </choose>
         <choose>
             <when test="scoreYear != null and scoreYear == 2023">
-                ORDER BY min_score_2023
+                ORDER BY min_score_2023 DESC
             </when>
             <when test="scoreYear != null and scoreYear == 2024">
-                ORDER BY min_score_2024
+                ORDER BY min_score_2024 DESC
             </when>
             <when test="scoreYear != null and scoreYear == 2025">
-                ORDER BY min_score_2025
+                ORDER BY min_score_2025 DESC
             </when>
             <otherwise>
-                ORDER BY COALESCE(min_score_2025, min_score_2024, min_score_2023)
+                ORDER BY COALESCE(min_score_2025, min_score_2024, min_score_2023) DESC
             </otherwise>
         </choose>
     </select>
