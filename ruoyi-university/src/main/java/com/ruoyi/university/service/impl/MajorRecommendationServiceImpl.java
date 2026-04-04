@@ -257,6 +257,41 @@ public class MajorRecommendationServiceImpl implements MajorRecommendationServic
         }
     }
 
+    private static final Set<String> SOUTHERN_PROVINCES = new HashSet<>(Arrays.asList(
+            "上海", "江苏", "浙江", "安徽", "福建", "江西", "湖北", "湖南",
+            "广东", "广西", "海南", "重庆", "四川", "贵州", "云南", "西藏"
+    ));
+    private static final Set<String> NORTHERN_PROVINCES = new HashSet<>(Arrays.asList(
+            "北京", "天津", "河北", "山西", "辽宁", "吉林",
+            "山东", "河南", "陕西", "甘肃", "青海", "宁夏", "新疆"
+    ));
+    private static final Set<String> FIRST_TIER_PROVINCES = new HashSet<>(Arrays.asList(
+            "北京", "上海", "广东"
+    ));
+
+    /**
+     * 判断高校是否匹配用户的地域偏好
+     * @param regionPreference 1-本省 2-一线城市 3-南方城市 4-北方城市 5-无要求
+     */
+    private static boolean isRegionMatch(University university, Integer regionPreference, String userProvince) {
+        if (university == null || university.getLocation() == null) {
+            return false;
+        }
+        String loc = university.getLocation();
+        switch (regionPreference) {
+            case 1:
+                return userProvince != null && loc.contains(userProvince);
+            case 2:
+                return FIRST_TIER_PROVINCES.contains(loc);
+            case 3:
+                return SOUTHERN_PROVINCES.contains(loc);
+            case 4:
+                return NORTHERN_PROVINCES.contains(loc);
+            default:
+                return true;
+        }
+    }
+
     @Override
     public Map<String, Object> getTieredRecommendations(int limit) {
         Long userId = SecurityUtils.getUserId();
@@ -289,6 +324,17 @@ public class MajorRecommendationServiceImpl implements MajorRecommendationServic
                     .collect(Collectors.toList());
             if (levelFiltered.size() >= limit) {
                 candidates = levelFiltered;
+            }
+        }
+
+        // 若设置了地域偏好（南方/北方/一线城市），按地域过滤
+        Integer regionPref = userInfo.getRegionPreference();
+        if (regionPref != null && regionPref >= 2 && regionPref <= 4) {
+            List<Major> regionFiltered = candidates.stream()
+                    .filter(m -> isRegionMatch(universityMap.get(m.getUniversityId()), regionPref, null))
+                    .collect(Collectors.toList());
+            if (regionFiltered.size() >= limit) {
+                candidates = regionFiltered;
             }
         }
 
