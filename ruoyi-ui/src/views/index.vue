@@ -361,13 +361,27 @@ export default {
       api(row.noticeId).then((response) => {
         const data = response.data;
         this.selectedNotice.title = data.noticeTitle;
-        this.selectedNotice.content = data.noticeContent;
+        this.selectedNotice.content = this.fixExternalLinks(data.noticeContent);
         this.showNoticeDialog = true;
         this.loading = false;
       }).catch(() => {
         this.loading = false;
         this.$message.error('加载公告失败');
       });
+    },
+    fixExternalLinks(html) {
+      if (!html) return html;
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      div.querySelectorAll('a[href]').forEach(link => {
+        let href = link.getAttribute('href');
+        if (href && !/^(https?:\/\/|mailto:|tel:|#|\/)/.test(href)) {
+          link.setAttribute('href', 'http://' + href);
+        }
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      });
+      return div.innerHTML;
     },
     initEchartsText() {
       const chartDom = this.$refs.echartsText;
