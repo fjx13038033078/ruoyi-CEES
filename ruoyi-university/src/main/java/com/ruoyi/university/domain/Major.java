@@ -55,6 +55,9 @@ public class Major implements Serializable {
     private String keyword;
 
     @TableField(exist = false)
+    private String universityKeyword;
+
+    @TableField(exist = false)
     private int minScore;
 
     @TableField(exist = false)

@@ -16,60 +16,66 @@
 
     <!-- 根据条件查询专业信息；scoreYear 指定分数线筛选/排序年份，未指定则按最新可用分数 COALESCE -->
     <select id="getAllMajors" parameterType="map" resultMap="MajorResult">
-        SELECT * FROM cers_major
+        SELECT m.* FROM cers_major m
+        <if test="universityKeyword != null and universityKeyword != ''">
+            INNER JOIN cers_university u ON m.university_id = u.university_id
+        </if>
         WHERE 1=1
+        <if test="universityKeyword != null and universityKeyword != ''">
+            AND u.university_name LIKE CONCAT('%', #{universityKeyword}, '%')
+        </if>
         <if test="keyword != null and keyword != ''">
-            AND major_name LIKE CONCAT('%', #{keyword}, '%')
+            AND m.major_name LIKE CONCAT('%', #{keyword}, '%')
         </if>
         <if test="subject != null">
-            AND subject = #{subject}
+            AND m.subject = #{subject}
         </if>
         <choose>
             <when test="scoreYear != null and scoreYear == 2023">
                 <if test="minScore != null and minScore > 0">
-                    AND min_score_2023 &gt;= #{minScore}
+                    AND m.min_score_2023 &gt;= #{minScore}
                 </if>
                 <if test="maxScore != null and maxScore > 0">
-                    AND min_score_2023 &lt;= #{maxScore}
+                    AND m.min_score_2023 &lt;= #{maxScore}
                 </if>
             </when>
             <when test="scoreYear != null and scoreYear == 2024">
                 <if test="minScore != null and minScore > 0">
-                    AND min_score_2024 &gt;= #{minScore}
+                    AND m.min_score_2024 &gt;= #{minScore}
                 </if>
                 <if test="maxScore != null and maxScore > 0">
-                    AND min_score_2024 &lt;= #{maxScore}
+                    AND m.min_score_2024 &lt;= #{maxScore}
                 </if>
             </when>
             <when test="scoreYear != null and scoreYear == 2025">
                 <if test="minScore != null and minScore > 0">
-                    AND min_score_2025 &gt;= #{minScore}
+                    AND m.min_score_2025 &gt;= #{minScore}
                 </if>
                 <if test="maxScore != null and maxScore > 0">
-                    AND min_score_2025 &lt;= #{maxScore}
+                    AND m.min_score_2025 &lt;= #{maxScore}
                 </if>
             </when>
             <otherwise>
                 <if test="minScore != null and minScore > 0">
-                    AND COALESCE(min_score_2025, min_score_2024, min_score_2023) &gt;= #{minScore}
+                    AND COALESCE(m.min_score_2025, m.min_score_2024, m.min_score_2023) &gt;= #{minScore}
                 </if>
                 <if test="maxScore != null and maxScore > 0">
-                    AND COALESCE(min_score_2025, min_score_2024, min_score_2023) &lt;= #{maxScore}
+                    AND COALESCE(m.min_score_2025, m.min_score_2024, m.min_score_2023) &lt;= #{maxScore}
                 </if>
             </otherwise>
         </choose>
         <choose>
             <when test="scoreYear != null and scoreYear == 2023">
-                ORDER BY min_score_2023 DESC
+                ORDER BY m.min_score_2023 DESC
             </when>
             <when test="scoreYear != null and scoreYear == 2024">
-                ORDER BY min_score_2024 DESC
+                ORDER BY m.min_score_2024 DESC
             </when>
             <when test="scoreYear != null and scoreYear == 2025">
-                ORDER BY min_score_2025 DESC
+                ORDER BY m.min_score_2025 DESC
             </when>
             <otherwise>
-                ORDER BY COALESCE(min_score_2025, min_score_2024, min_score_2023) DESC
+                ORDER BY COALESCE(m.min_score_2025, m.min_score_2024, m.min_score_2023) DESC
             </otherwise>
         </choose>
     </select>

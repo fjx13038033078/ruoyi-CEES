@@ -2,6 +2,9 @@
   <div class="app-container">
     <!-- 搜索表单 -->
     <el-form :inline="true" :model="searchParams" class="demo-form-inline">
+      <el-form-item label="高校关键字">
+        <el-input v-model="searchParams.universityKeyword" placeholder="请输入高校名称" clearable style="width: 180px"></el-input>
+      </el-form-item>
       <el-form-item label="专业关键字">
         <el-input v-model="searchParams.keyword" placeholder="请输入专业关键字" clearable style="width: 180px"></el-input>
       </el-form-item>
@@ -132,6 +135,7 @@ export default {
         pageSize: 10,
       },
       searchParams: {
+        universityKeyword: '',
         keyword: '',
         subject: null,
         scoreYear: 2025,
@@ -176,6 +180,7 @@ export default {
     },
     handleReset() {
       this.searchParams = {
+        universityKeyword: '',
         keyword: '',
         subject: null,
         scoreYear: 2025,
