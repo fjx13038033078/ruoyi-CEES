@@ -18,12 +18,31 @@
         <result property="checkMessages" column="check_messages"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
+        <result property="universityName" column="university_name"/>
+        <result property="majorName1" column="major_name_1"/>
+        <result property="majorName2" column="major_name_2"/>
+        <result property="majorName3" column="major_name_3"/>
+        <result property="majorName4" column="major_name_4"/>
+        <result property="majorName5" column="major_name_5"/>
+        <result property="majorName6" column="major_name_6"/>
     </resultMap>
 
     <select id="selectItemsByFormId" parameterType="Long" resultMap="VolunteerItemResult">
-        SELECT vi.*, u.university_name
+        SELECT vi.*, u.university_name,
+            m1.major_name AS major_name_1,
+            m2.major_name AS major_name_2,
+            m3.major_name AS major_name_3,
+            m4.major_name AS major_name_4,
+            m5.major_name AS major_name_5,
+            m6.major_name AS major_name_6
         FROM cers_volunteer_item vi
         LEFT JOIN cers_university u ON vi.university_id = u.university_id
+        LEFT JOIN cers_major m1 ON vi.major_id_1 = m1.major_id
+        LEFT JOIN cers_major m2 ON vi.major_id_2 = m2.major_id
+        LEFT JOIN cers_major m3 ON vi.major_id_3 = m3.major_id
+        LEFT JOIN cers_major m4 ON vi.major_id_4 = m4.major_id
+        LEFT JOIN cers_major m5 ON vi.major_id_5 = m5.major_id
+        LEFT JOIN cers_major m6 ON vi.major_id_6 = m6.major_id
         WHERE vi.form_id = #{formId}
         ORDER BY vi.sort_order ASC
     </select>

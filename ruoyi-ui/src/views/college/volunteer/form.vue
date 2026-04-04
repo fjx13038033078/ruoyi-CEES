@@ -53,6 +53,11 @@
                     <div class="vol-uni-name">{{ item.universityName || '未选择院校' }}</div>
                     <div class="vol-major-info">
                       <el-tag v-if="item.majorName1" size="small">{{ item.majorName1 }}</el-tag>
+                      <el-tag v-if="item.majorName2" size="small">{{ item.majorName2 }}</el-tag>
+                      <el-tag v-if="item.majorName3" size="small">{{ item.majorName3 }}</el-tag>
+                      <el-tag v-if="item.majorName4" size="small">{{ item.majorName4 }}</el-tag>
+                      <el-tag v-if="item.majorName5" size="small">{{ item.majorName5 }}</el-tag>
+                      <el-tag v-if="item.majorName6" size="small">{{ item.majorName6 }}</el-tag>
                     </div>
                     <div v-if="item.checkMessages" class="check-msg">
                       <div v-for="(msg, mi) in parseMessages(item.checkMessages)" :key="mi" class="msg-item">

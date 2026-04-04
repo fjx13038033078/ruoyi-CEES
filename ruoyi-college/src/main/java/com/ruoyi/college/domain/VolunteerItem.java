@@ -54,5 +54,20 @@ public class VolunteerItem implements Serializable {
     private String majorName1;
 
     @TableField(exist = false)
+    private String majorName2;
+
+    @TableField(exist = false)
+    private String majorName3;
+
+    @TableField(exist = false)
+    private String majorName4;
+
+    @TableField(exist = false)
+    private String majorName5;
+
+    @TableField(exist = false)
+    private String majorName6;
+
+    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }
