@@ -30,52 +30,18 @@
         </el-card>
       </el-col>
 
-      <!-- 图表2：各省份投档线年度走势 -->
-      <el-col :span="12">
-        <el-card shadow="never" class="chart-card">
-          <div slot="header" class="card-header">
-            <b>各省份投档线年度走势（2022-2024）</b>
-            <div class="header-controls">
-              <el-radio-group v-model="subjectType" size="mini" @change="renderProvinceTrend">
-                <el-radio-button label="liberal">历史类</el-radio-button>
-                <el-radio-button label="science">物理类</el-radio-button>
-              </el-radio-group>
-              <el-select
-                v-model="selectedProvinces"
-                multiple
-                filterable
-                collapse-tags
-                placeholder="选择省份（最多5个）"
-                style="width: 220px; margin-left: 8px"
-                size="small"
-                @change="onProvinceChange"
-              >
-                <el-option
-                  v-for="p in provinceList"
-                  :key="p.provinceId"
-                  :label="p.provinceName"
-                  :value="p.provinceId"
-                  :disabled="selectedProvinces.length >= 5 && !selectedProvinces.includes(p.provinceId)"
-                ></el-option>
-              </el-select>
-            </div>
-          </div>
-          <div ref="provinceTrendChart" class="chart-area"></div>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <el-row :gutter="20" style="margin-top: 20px">
-      <!-- 图表3：高校层次与类型分布 -->
+      <!-- 图表2：高校层次与类型分布 -->
       <el-col :span="12">
         <el-card shadow="never" class="chart-card">
           <div slot="header"><b>高校层次与类型分布</b></div>
           <div ref="uniDistChart" class="chart-area"></div>
         </el-card>
       </el-col>
+    </el-row>
 
-      <!-- 图表4：各省份高校资源对比 -->
-      <el-col :span="12">
+    <el-row :gutter="20" style="margin-top: 20px">
+      <!-- 图表3：各省份高校资源对比 -->
+      <el-col :span="24">
         <el-card shadow="never" class="chart-card">
           <div slot="header"><b>各省份高校资源对比</b></div>
           <div ref="provinceResourceChart" class="chart-area-tall"></div>
@@ -100,8 +66,6 @@ export default {
       uniLoading: false,
       selectedUniId: null,
       provinceList: [],
-      selectedProvinces: [],
-      subjectType: 'liberal',
       charts: {}
     };
   },
@@ -129,10 +93,6 @@ export default {
         this.onUniversityChange(this.selectedUniId);
       }
 
-      const top5 = this.provinceList.filter(p => p.numTotal > 0).sort((a, b) => b.numTotal - a.numTotal).slice(0, 5);
-      this.selectedProvinces = top5.map(p => p.provinceId);
-      this.renderProvinceTrend();
-
       this.renderUniDist(distRes.data || {});
       this.renderProvinceResource();
     },
@@ -149,10 +109,6 @@ export default {
       if (!universityId) return;
       const res = await getMajorTrend(universityId);
       this.renderMajorTrend(res.data || []);
-    },
-
-    onProvinceChange() {
-      this.renderProvinceTrend();
     },
 
     handleResize() {
@@ -207,54 +163,7 @@ export default {
       }, true);
     },
 
-    // ========== 图表2：省份投档线走势 ==========
-    renderProvinceTrend() {
-      if (!this.$refs.provinceTrendChart) return;
-      if (this.charts.provinceTrend) this.charts.provinceTrend.dispose();
-      const chart = echarts.init(this.$refs.provinceTrendChart);
-      this.charts.provinceTrend = chart;
-
-      const selected = this.provinceList.filter(p => this.selectedProvinces.includes(p.provinceId));
-      if (selected.length === 0) {
-        chart.setOption({ title: { text: '请选择省份', left: 'center', top: 'middle', textStyle: { color: '#999', fontSize: 14 } } });
-        return;
-      }
-
-      const isLiberal = this.subjectType === 'liberal';
-      const series = selected.map((p, i) => ({
-        name: p.provinceName,
-        type: 'line',
-        data: isLiberal
-          ? [p.minScoreLiberal2022, p.minScoreLiberal2023, p.minScoreLiberal2024]
-          : [p.minScoreScience2022, p.minScoreScience2023, p.minScoreScience2024],
-        smooth: true,
-        symbol: 'circle',
-        symbolSize: 8,
-        lineStyle: { width: 2 },
-        itemStyle: { color: COLORS[i % COLORS.length] },
-        connectNulls: true
-      }));
-
-      chart.setOption({
-        tooltip: {
-          trigger: 'axis',
-          formatter: params => {
-            let html = `<b>${params[0].axisValue}</b><br/>`;
-            params.forEach(p => {
-              if (p.value != null) html += `${p.marker} ${p.seriesName}：<b>${p.value}</b>分<br/>`;
-            });
-            return html;
-          }
-        },
-        legend: { bottom: 0, textStyle: { fontSize: 11 } },
-        grid: { top: 30, right: 20, bottom: 40, left: 55 },
-        xAxis: { type: 'category', data: ['2022年', '2023年', '2024年'], boundaryGap: false },
-        yAxis: { type: 'value', name: '投档线（分）', min: function(v) { return Math.max(0, v.min - 20); } },
-        series
-      }, true);
-    },
-
-    // ========== 图表3：高校层次与类型分布 ==========
+    // ========== 图表2：高校层次与类型分布 ==========
     renderUniDist(dist) {
       if (!this.$refs.uniDistChart) return;
       if (this.charts.uniDist) this.charts.uniDist.dispose();
@@ -296,7 +205,7 @@ export default {
       }, true);
     },
 
-    // ========== 图表4：各省份高校资源对比 ==========
+    // ========== 图表3：各省份高校资源对比 ==========
     renderProvinceResource() {
       if (!this.$refs.provinceResourceChart) return;
       if (this.charts.provinceResource) this.charts.provinceResource.dispose();
@@ -350,12 +259,6 @@ export default {
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
-  }
-  .header-controls {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 4px;
   }
   .chart-area {
     width: 100%;
